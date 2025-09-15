@@ -50,6 +50,7 @@
 #include "app_log.h"
 #include "blinky.h"
 #include "wifi_app.h"
+#include "wifi_ota.h"
 
 // WLAN include file for configuration
 
@@ -413,6 +414,30 @@ void wifi_app_task()
 
       case WIFI_APP_IPCONFIG_DONE_STATE: {
         wifi_app_clear_event(WIFI_APP_IPCONFIG_DONE_STATE);
+
+        // 初始化并启动OTA功能
+        ota_server_config_t ota_config = {
+          .hostname = AWS_S3_HOSTNAME,
+          .version_check_path = AWS_S3_VERSION_FILE_PATH,
+          .firmware_base_path = AWS_S3_FIRMWARE_PATH,
+          .port = AWS_S3_PORT,
+          .https_enabled = true
+        };
+
+        sl_status_t ota_status = ota_init(&ota_config);
+        if (ota_status == SL_STATUS_OK) {
+          app_log_info("OTA initialized successfully\r\n");
+
+          // 启动自动版本检查
+          ota_status = ota_start_auto_check();
+          if (ota_status == SL_STATUS_OK) {
+            app_log_info("OTA auto check started\r\n");
+          } else {
+            app_log_error("Failed to start OTA auto check: 0x%lx\r\n", ota_status);
+          }
+        } else {
+          app_log_error("Failed to initialize OTA: 0x%lx\r\n", ota_status);
+        }
 
         osSemaphoreRelease(wlan_thread_sem);
         LOG_PRINT("WIFI App IPCONFIG Done State\r\n");

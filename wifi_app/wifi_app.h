@@ -2,6 +2,7 @@
 #define WIFI_APP_H
 
 #include "sl_status.h"
+#include "wifi_ota.h"
 
 typedef enum {
   CATCOLLAR_WIFI_DISCONNECTED = 0,
