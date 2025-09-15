@@ -373,7 +373,9 @@ sl_status_t ota_install_firmware(const char *firmware_path)
 {
     // 注意：实际的固件安装需要根据具体的bootloader和硬件平台来实现
     // 这里只是一个示例实现
-
+    if(!firmware_path){
+        return SL_STATUS_INVALID_PARAMETER;
+    }
     app_log_warning("Firmware installation is platform-specific and needs to be implemented\r\n");
     app_log_info("Please implement ota_install_firmware() for your specific platform\r\n");
 
